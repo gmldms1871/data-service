@@ -1,0 +1,12 @@
+# frontend build 등
+frontend/node_modules
+frontend/build
+
+# backend build 등
+backend/build
+backend/.gradle
+backend/.idea
+backend/out
+
+# 무조건 backend/.git은 무시해서 충돌 방지
+backend/.git
