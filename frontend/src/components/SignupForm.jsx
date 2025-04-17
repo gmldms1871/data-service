@@ -76,7 +76,7 @@ function SignupForm() {
                 interests: Object.keys(form.interests).filter(key => form.interests[key])
             };
 
-            const res = await fetch('http://localhost:4601/api/users', {
+            const res = await fetch(`${process.env.REACT_APP_API_HOST}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
