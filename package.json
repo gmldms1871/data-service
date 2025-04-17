@@ -1,0 +1,10 @@
+{
+  "name": "data-service",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter frontend run dev\" \"cd backend && ./gradlew bootRun\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
