@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: demo
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://to-on.kr:3306/hanyang1
+    #   url우리꺼로 수정하래요.
+    username: to_on_admin
+    password: BgCt9kuMws9jOivFj05UcEYpauecNa076H0oontnNrUGgG13lr
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        #implicit_naming_strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        dialect: org.hibernate.dialect.MySQLDialect
+        #dialect: org.hibernate.dialect.SQLServerDialect
+
+mybatis:
+  mapper-locations: mapper/*.xml
+
+server:
+  port: 3301
