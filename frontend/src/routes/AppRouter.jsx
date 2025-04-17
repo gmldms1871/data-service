@@ -11,7 +11,6 @@ export default function AppRouter() {
     return (
         <Router>
             <Routes>
-                <></>
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/main" element={isLoggedIn ? <MainPage /> : <Navigate to="/" />} />
                 <Route path="/mypage" element={isLoggedIn ? <MyPage /> : <Navigate to="/" />} />

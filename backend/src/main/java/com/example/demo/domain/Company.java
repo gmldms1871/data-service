@@ -27,6 +27,5 @@ public class Company {
     private String businessNumber;
     private String homepage;
     private String interestTopic;
-
     private java.time.LocalDateTime createdAt;
 }
