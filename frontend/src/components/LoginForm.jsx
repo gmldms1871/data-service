@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    console.log(process.env)
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:4601/api/login', {
+            const res = await fetch(`${process.env.REACT_APP_API_HOST}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include', // 세션 유지
@@ -32,22 +32,6 @@ function LoginForm() {
     return (
         <div className="bg-white p-8 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-6 text-center">환영합니다!</h2>
-
-            {/* 소셜 로그인 버튼 */}
-            <div className="flex flex-col space-y-3 mb-6">
-                <button className="social-btn flex items-center justify-center bg-yellow-400 text-white py-3 px-4 rounded-md w-full transition duration-300">
-                    <i className="fas fa-comment mr-3"></i>
-                    카카오로 시작하기
-                </button>
-                <button className="social-btn flex items-center justify-center bg-green-500 text-white py-3 px-4 rounded-md w-full transition duration-300">
-                    <i className="fas fa-mobile-alt mr-3"></i>
-                    네이버로 시작하기
-                </button>
-                <button className="social-btn flex items-center justify-center bg-gray-700 text-white py-3 px-4 rounded-md w-full transition duration-300">
-                    <i className="fab fa-apple mr-3"></i>
-                    Apple로 시작하기
-                </button>
-            </div>
 
             <div className="flex items-center mb-6">
                 <div className="flex-grow border-t border-gray-300"></div>

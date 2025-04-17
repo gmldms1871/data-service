@@ -17,7 +17,6 @@
     "start:frontend": "react-scripts start",
     "dev": "npm run start:frontend"
   },
-  "proxy": "http://localhost:4601",
   "eslintConfig": {
     "extends": [
       "react-app",
