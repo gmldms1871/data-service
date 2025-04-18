@@ -2,6 +2,8 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+//ToDo 메인페이지 접근이 로그인 안했을 때에도 접근이 가능함(navbar에 로고 눌렀을 때)
+
 function MainPage() {
     return (
         <div className="bg-gray-50 font-sans">

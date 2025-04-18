@@ -33,28 +33,6 @@ function LoginForm() {
         <div className="bg-white p-8 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-6 text-center">환영합니다!</h2>
 
-            {/* 소셜 로그인 버튼 */}
-            <div className="flex flex-col space-y-3 mb-6">
-                <button className="social-btn flex items-center justify-center bg-yellow-400 text-white py-3 px-4 rounded-md w-full transition duration-300">
-                    <i className="fas fa-comment mr-3"></i>
-                    카카오로 시작하기
-                </button>
-                <button className="social-btn flex items-center justify-center bg-green-500 text-white py-3 px-4 rounded-md w-full transition duration-300">
-                    <i className="fas fa-mobile-alt mr-3"></i>
-                    네이버로 시작하기
-                </button>
-                <button className="social-btn flex items-center justify-center bg-gray-700 text-white py-3 px-4 rounded-md w-full transition duration-300">
-                    <i className="fab fa-apple mr-3"></i>
-                    Apple로 시작하기
-                </button>
-            </div>
-
-            <div className="flex items-center mb-6">
-                <div className="flex-grow border-t border-gray-300"></div>
-                <span className="mx-4 text-gray-500 text-sm">또는</span>
-                <div className="flex-grow border-t border-gray-300"></div>
-            </div>
-
             <form onSubmit={handleLogin}>
                 <div className="mb-4">
                     <label htmlFor="email" className="block text-gray-700 font-medium mb-2">이메일</label>
