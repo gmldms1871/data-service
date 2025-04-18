@@ -16,7 +16,6 @@ frontend/dist/
 frontend/.next/
 frontend/.cache/
 frontend/pnpm-lock.yaml
-frontend/.env
 
 # Backend
 backend/build/
