@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -69,4 +69,26 @@ public class CompanyController {
         Company updated = companyService.update(id, updates);
         return ResponseEntity.ok(updated);
     }
+
+    @DeleteMapping("/users/me")
+    public ResponseEntity<?> deleteMyAccount(HttpSession session) {
+        String id = (String) session.getAttribute("loginCompanyId");
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("로그인 필요");
+        }
+
+        companyService.deleteById(id);     // 계정 삭제
+        session.invalidate();             // 세션 무효화
+
+        return ResponseEntity.ok("회원 탈퇴 완료");
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<Company>> getAllUsers() {
+        List<Company> companies = companyService.findAll();
+        return ResponseEntity.ok(companies);
+    }
 }
+
+

@@ -16,20 +16,22 @@ public class NotificationController {
     public NotificationController(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
-    //알림 생성
+    /** 알림 생성 */
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Map<String, String> request) {
-        String receiverEmail = request.get("receiverEmail");
-        String title = request.get("title");
-        String message = request.get("message");
+    public ResponseEntity<Notification> create(@RequestBody Map<String, String> req) {
+        String receiverId = req.get("receiverId");
+        String title      = req.get("title");
+        String content    = req.get("content");
 
-        Notification created = notificationService.createNotification(receiverEmail, title, message);
+        Notification created = notificationService.createNotification(receiverId, title, content);
         return ResponseEntity.ok(created);
     }
-    //알림 조회
+    /** 알림 조회 */
     @GetMapping
-    public ResponseEntity<?> get(@RequestParam("userId") String email) {
-        List<Notification> notifications = notificationService.getNotifications(email);
+    public ResponseEntity<List<Notification>> list(
+            @RequestParam("receiverId") String receiverId
+    ) {
+        List<Notification> notifications = notificationService.getNotifications(receiverId);
         return ResponseEntity.ok(notifications);
     }
 }

@@ -1,6 +1,5 @@
-spring:
-  application:
-    name: demo
+application:
+  name: demo
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -11,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

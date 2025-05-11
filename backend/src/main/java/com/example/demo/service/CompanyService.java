@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class CompanyService {
@@ -19,8 +18,9 @@ public class CompanyService {
 
     // 회원가입
     public Company register(Company company) {
-        if (company.getEmail() == null || company.getPassword() == null || company.getUserName() == null
-                || company.getCompanyName() == null || company.getBusinessNumber() == null || company.getUserPhone() == null) {
+        if (company.getEmail() == null || company.getPassword() == null
+                || company.getUserName() == null || company.getCompanyName() == null
+                || company.getBusinessNumber() == null || company.getUserPhone() == null) {
             throw new IllegalArgumentException("필수 항목이 누락되었습니다.");
         }
 
@@ -28,7 +28,7 @@ public class CompanyService {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
 
-        company.setId(UUID.randomUUID().toString()); // UUID 자동 생성
+        // UUID 수동 생성 불필요: 엔티티 레벨에서 자동 생성됨
         return companyRepository.save(company);
     }
 
@@ -61,5 +61,10 @@ public class CompanyService {
     // 전체 기업 목록
     public List<Company> findAll() {
         return companyRepository.findAll();
+    }
+
+    public void deleteById(String id) {
+        Company company = findById(id);        // 존재 여부 체크
+        companyRepository.delete(company);     // 엔티티 삭제
     }
 }

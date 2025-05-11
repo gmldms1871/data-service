@@ -13,16 +13,16 @@ public class NotificationService {
     public NotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
-    //알림 생성(문의 생성할 떄 동시 호출 추가해야함)
-    public Notification createNotification(String receiverEmail, String title, String message) {
+    // 알림 생성: 파라미터를 receiverId, content로 변경
+    public Notification createNotification(String receiverId, String title, String content) {
         Notification notification = new Notification();
-        notification.setReceiverEmail(receiverEmail);
+        notification.setReceiverId(receiverId);
         notification.setTitle(title);
-        notification.setMessage(message);
+        notification.setContent(content);
         return notificationRepository.save(notification);
     }
-    //알림 조회
-    public List<Notification> getNotifications(String receiverEmail) {
-        return notificationRepository.findByReceiverEmail(receiverEmail);
+    // 알림 조회: receiverId로 조회
+    public List<Notification> getNotifications(String receiverId) {
+        return notificationRepository.findByReceiverId(receiverId);
     }
 }

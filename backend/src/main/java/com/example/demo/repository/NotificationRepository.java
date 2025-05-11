@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    List<Notification> findByReceiverEmail(String receiverEmail);
+public interface NotificationRepository extends JpaRepository<Notification, String> {
+    // 엔티티 필드명 receiverId에 맞게 수정
+    List<Notification> findByReceiverId(String receiverId);
 }
