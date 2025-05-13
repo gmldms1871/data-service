@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.TransactionMapper">
+    <!-- 거래 확인을 위한 쿼리 -->
+    <select id="getSellerConfirmed" resultType="Integer">
+        SELECT seller_confirmed
+        FROM transaction
+        WHERE id = #{transactionId}
+    </select>
+
+    <select id="getBuyerConfirmed" resultType="Integer">
+        SELECT buyer_confirmed
+        FROM transaction
+        WHERE id = #{transactionId}
+    </select>
+</mapper>

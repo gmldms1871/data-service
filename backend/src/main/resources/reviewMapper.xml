@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.ReviewMapper">
+    <resultMap id="reviewResultMap" type="com.example.demo.dto.ReviewDto">
+        <result property="id" column="id"/>
+        <result property="buyerId" column="buyer_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="companyId" column="company_id"/>
+        <result property="transactionId" column="transaction_id"/>
+        <result property="rating" column="rating"/>
+        <result property="review" column="review"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findById" parameterType="string" resultType="com.example.demo.dto.ReviewDto">
+        SELECT
+            id,
+            product_id,
+            company_id,
+            transaction_id,
+            rating,
+            review,
+            created_at
+        FROM reviews
+        WHERE id = #{id}
+    </select>
+
+    <!-- 제품 ID로 리뷰 조회 -->
+    <select id="findByProductId" parameterType="String" resultMap="reviewResultMap">
+        SELECT * FROM reviews WHERE product_id = #{productId}
+    </select>
+
+    <!-- 회사 ID로 리뷰 조회 -->
+    <select id="findByCompanyId" parameterType="String" resultMap="reviewResultMap">
+        SELECT * FROM reviews WHERE company_id = #{companyId}
+    </select>
+
+    <!-- 리뷰 등록 -->
+    <insert id="insertReview" parameterType="com.example.demo.dto.ReviewDto">
+        INSERT INTO reviews (id, product_id, company_id, transaction_id, rating, review, created_at)
+        VALUES (#{id}, #{productId}, #{companyId}, #{transactionId}, #{rating}, #{review}, CURRENT_TIMESTAMP)
+    </insert>
+
+    <!-- 리뷰 수정 -->
+    <update id="updateReview" parameterType="com.example.demo.dto.ReviewDto">
+        UPDATE reviews
+        SET rating = #{rating}, review = #{review}, created_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- 리뷰 삭제 -->
+    <delete id="deleteReview" parameterType="String">
+        DELETE FROM reviews WHERE id = #{id}
+    </delete>
+</mapper>
+
+
