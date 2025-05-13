@@ -1,3 +1,4 @@
+// build.gradle
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
@@ -23,7 +24,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
-	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+
+	// MySQL 드라이버 수정 - 기존 버전이 호환성 문제가 있을 수 있음
+	implementation 'com.mysql:mysql-connector-j:8.3.0'
+	// 또는 runtimeOnly 'com.mysql:mysql-connector-j:8.3.0'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
