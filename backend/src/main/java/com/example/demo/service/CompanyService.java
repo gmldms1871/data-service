@@ -52,7 +52,6 @@ public class CompanyService {
         if (updates.containsKey("nickname")) company.setNickname(updates.get("nickname"));
         if (updates.containsKey("companyName")) company.setCompanyName(updates.get("companyName"));
         if (updates.containsKey("homepage")) company.setHomepage(updates.get("homepage"));
-        if (updates.containsKey("interestTopic")) company.setInterestTopic(updates.get("interestTopic"));
         if (updates.containsKey("categoryId")) company.setCategoryId(updates.get("categoryId"));
 
         return companyRepository.save(company);

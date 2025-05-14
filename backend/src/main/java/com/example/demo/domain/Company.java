@@ -49,8 +49,7 @@ public class Company {
     @Column(name = "homepage")
     private String homepage;
 
-    @Column(name = "interest_topic", columnDefinition = "TEXT")
-    private String interestTopic;
+
 
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
