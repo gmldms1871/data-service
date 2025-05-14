@@ -14,16 +14,16 @@ import java.time.LocalDateTime;
 public class Transaction {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", length = 100)
     private String id; // 거래 고유 ID
 
-    @Column(name = "buyer_id", nullable = false)
+    @Column(name = "buyer_id", nullable = false, length = 100)
     private String buyerId; // 문의 ID (inquiries.id) — 구매자 식별용
 
     @Column(name = "seller_id", nullable = false, length = 100)
     private String sellerId; // 판매자 이메일 (company.id)
 
-    @Column(name = "product_id", nullable = false)
+    @Column(name = "product_id", nullable = false, length = 100)
     private String productId; // 거래 상품 ID
 
     @Column(name = "seller_confirmed")

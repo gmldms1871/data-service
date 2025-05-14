@@ -22,7 +22,7 @@ public class Ads {
     @Column(name = "product_id", nullable = false, length = 100)
     private String productId;
 
-    @Column(name = "sub_add_id", nullable = false)
+    @Column(name = "sub_add_id", nullable = false, length = 100)
     private Long subAddId;
 
     @Column(name = "ad_image", length = 255)

@@ -16,6 +16,7 @@ import java.util.UUID;
 public class Products {
 
     @Id
+    @Column(name = "id", length = 100)
     private String id;
 
     @Column(name = "company_id", length = 100)
