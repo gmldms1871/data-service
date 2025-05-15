@@ -1,3 +1,4 @@
+// AdsController.java
 package com.example.demo.controller;
 
 import com.example.demo.domain.Ads;
@@ -6,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -19,31 +21,32 @@ public class AdsController {
         this.adsService = adsService;
     }
 
-    // 메인 페이지: 전체 광고 리스트 조회
+    // 1) 전체 광고 조회
     @GetMapping
     public ResponseEntity<List<Ads>> getAllAds() {
-        List<Ads> ads = adsService.getAllAds();
-        return new ResponseEntity<>(ads, HttpStatus.OK);
+        return ResponseEntity.ok(adsService.getAllAds());
     }
 
-    // My 페이지: 나의 광고 목록 조회 (companyId로 조회)
+    // 2) 내 광고 조회 (companyId 파라미터)
     @GetMapping(params = "companyId")
     public ResponseEntity<List<Ads>> getMyAds(@RequestParam String companyId) {
-        List<Ads> myAds = adsService.getAdsByCompanyId(companyId);
-        return new ResponseEntity<>(myAds, HttpStatus.OK);
+        return ResponseEntity.ok(adsService.getAdsByCompanyId(companyId));
     }
 
-    // 광고 등록
+    // 3) 광고 등록 (adsPeriod 포함)
     @PostMapping
     public ResponseEntity<Ads> createAd(@RequestBody Ads ad) {
-        Ads createdAd = adsService.createAd(ad);
-        return new ResponseEntity<>(createdAd, HttpStatus.CREATED);
+        Ads created = adsService.createAd(ad);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
-    // 광고 삭제 (id는 문자열)
+    // 4) 광고 삭제 (companyId 검증 포함)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAd(@PathVariable String id) {
-        adsService.deleteAd(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> deleteAd(
+            @PathVariable String id,
+            @RequestParam String companyId
+    ) {
+        adsService.deleteAd(id, companyId);
+        return ResponseEntity.noContent().build();
     }
 }

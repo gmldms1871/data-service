@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -43,7 +44,7 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<?> createReview(@RequestBody ReviewDto dto) {
         System.out.println("Received ReviewDto: " + dto);  // 로그 출력
-
+        dto.setId(UUID.randomUUID().toString());
         // `createdAt` 필드를 현재 시간으로 자동 설정
         dto.setCreatedAt(LocalDateTime.now());
 
