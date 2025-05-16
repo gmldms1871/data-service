@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.domain.Products;
 import com.example.demo.repository.ProductsRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,6 @@ public class ProductsService {
         return productsRepository.findById(id).map(existingProduct -> {
             existingProduct.setName(updatedProduct.getName());
             existingProduct.setDescription(updatedProduct.getDescription());
-            existingProduct.setCategory(updatedProduct.getCategory());
             existingProduct.setCategoryId(updatedProduct.getCategoryId());
             existingProduct.setMainImage(updatedProduct.getMainImage());
             existingProduct.setDescriptionImage(updatedProduct.getDescriptionImage());
@@ -56,7 +56,9 @@ public class ProductsService {
         }).orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
     }
 
+    @Transactional
     public void deleteProduct(String id) {
         productsRepository.deleteById(id);
     }
+
 }

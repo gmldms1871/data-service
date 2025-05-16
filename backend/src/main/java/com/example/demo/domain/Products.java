@@ -34,9 +34,6 @@ public class Products {
     @Column(name = "extension_list", columnDefinition = "TEXT")
     private String extensionList;
 
-    @Column(name = "category", length = 50)
-    private String category;
-
     @Column(name = "name", length = 100)  // nullable = false 제거
     private String name;
 
