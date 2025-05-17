@@ -2,8 +2,10 @@ package com.example.demo.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +18,8 @@ import java.util.UUID;
 public class Products {
 
     @Id
+    @GeneratedValue
+    @UuidGenerator
     @Column(name = "id", length = 100)
     private String id;
 
@@ -24,6 +28,17 @@ public class Products {
 
     @Column(name = "category_id", length = 100)
     private String categoryId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", insertable = false, updatable = false)
+    private Company company;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    private Category category;
+
+    @OneToMany(mappedBy = "product")
+    private List<ProductTag> productTags;
 
     @Column(name = "main_image", length = 255)
     private String mainImage;
