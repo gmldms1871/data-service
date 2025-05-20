@@ -1,14 +1,10 @@
 package com.example.demo.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
-
-
-import lombok.*;
 
 @Entity
 @Table(name = "inquiries")
@@ -21,7 +17,9 @@ import lombok.*;
 public class Inquiries {
 
     @Id
-    @Column(name = "id", length = 100)
+    @GeneratedValue
+    @UuidGenerator
+    @Column(name = "id", updatable = false, nullable = false, length = 100)
     private String id;
 
     @Column(name = "company_id", length = 100)
@@ -42,12 +40,13 @@ public class Inquiries {
 
 
 }
-//http://localhost:4601/api/inquiries?productId=1
+
+// companyId로 조회 또는 전과 같ㅣ productId로 조회
+//http://localhost:4601/api/inquiries?productId=1      =  4637fa67-a024-4a73-a11f-23ce4ca7ab6b
 
 //{
-//  "companyId": "1",
-//  "productId": 1,
-//  "budget": 5000,
+
+//  "budgetmmffrf": 5000,
 //  "message": "문의 제목",
 //  "description": "문의 내용",
 //  "attachmentId": null
