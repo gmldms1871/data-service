@@ -8,6 +8,12 @@ import java.util.List;
 public interface InquiriesRepository extends JpaRepository<Inquiries, String> {
     // productId로 문의 목록 조회
     List<Inquiries> findByProductId(String productId);
+
+    // companyId로 문의 목록 조회
+    List<Inquiries> findByCompanyId(String companyId);
+
+    //
+    List<Inquiries> findByCompanyIdAndProductId(String companyId, String productId);
 }
 
 
