@@ -1,7 +1,9 @@
 package com.example.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -16,14 +18,28 @@ import java.util.UUID;
 public class Products {
 
     @Id
-    @Column(name = "id", length = 100)
+    @GeneratedValue
+    @UuidGenerator
+    @Column(name = "id", updatable = false, nullable = false, length = 100)
     private String id;
+
+    private Integer price;
 
     @Column(name = "company_id", length = 100)
     private String companyId;
 
     @Column(name = "category_id", length = 100)
     private String categoryId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", insertable = false, updatable = false)
+    @JsonIgnore
+    private Company company;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    @JsonIgnore
+    private Category category;
 
     @Column(name = "main_image", length = 255)
     private String mainImage;
@@ -34,7 +50,7 @@ public class Products {
     @Column(name = "extension_list", columnDefinition = "TEXT")
     private String extensionList;
 
-    @Column(name = "name", length = 100)  // nullable = false 제거
+    @Column(name = "name", length = 100)
     private String name;
 
     @Column(name = "description", columnDefinition = "TEXT")
@@ -43,10 +59,10 @@ public class Products {
     @Column(name = "attachment_id", length = 100)
     private String attachmentId;
 
-    @Column(name = "created_at", nullable = true, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = true)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
@@ -54,9 +70,6 @@ public class Products {
 
     @PrePersist
     protected void onCreate() {
-        if (this.id == null || this.id.isEmpty()) {
-            this.id = UUID.randomUUID().toString();
-        }
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

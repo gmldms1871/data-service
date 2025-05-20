@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 public class Ads {
 
     @Id
-    @GeneratedValue
     @UuidGenerator
     @Column(name = "id", nullable = false, length = 100)
     private String id;

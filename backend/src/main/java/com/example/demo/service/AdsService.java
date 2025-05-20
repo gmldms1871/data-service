@@ -29,23 +29,19 @@ public class AdsService {
 
     // 회사별 광고 조회 (마이페이지)
     public List<Ads> getAdsByCompanyId(String companyId) {
-        return adsRepository.findByCompanyId(companyId);
+        List<Ads> ads = adsRepository.findByCompanyId(companyId);
+        return ads != null ? ads : List.of(); // 방어적 코드
     }
-
     // 광고 등록: adsPeriod, createAt, deletedAt 계산 후 저장
     public Ads createAd(Ads ad) {
-        LocalDateTime now = LocalDateTime.now();
-        ad.setCreateAt(now);
-        ad.setDeletedAt(now.plusDays(ad.getAdsPeriod()));
+        ad.setDeletedAt(LocalDateTime.now().plusDays(ad.getAdsPeriod()));
         return adsRepository.save(ad);
     }
 
     // 광고 단건 조회 (삭제·권한검사용)
     public Ads getAdById(String id) {
         return adsRepository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("해당 광고를 찾을 수 없습니다: " + id)
-                );
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 광고를 찾을 수 없습니다: " + id));
     }
 
     // 광고 삭제: 실제 삭제, 본인 회사만

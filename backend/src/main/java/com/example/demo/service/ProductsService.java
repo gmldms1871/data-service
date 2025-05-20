@@ -2,14 +2,11 @@ package com.example.demo.service;
 
 import com.example.demo.domain.Products;
 import com.example.demo.repository.ProductsRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
-import java.util.UUID;
 
 @Service
 public class ProductsService {
@@ -21,44 +18,32 @@ public class ProductsService {
         return productsRepository.findAll();
     }
 
-    public Optional<Products> getProductById(String id) {
-        return productsRepository.findById(id);
+    public Optional<Products> getProductById(String productId) {
+        return productsRepository.findById(productId);
     }
 
-
-    public Products createProduct(Products product) {
-        if (product.getId() == null || product.getId().isEmpty()) {
-            product.setId(UUID.randomUUID().toString());
-        }
-
-        // 필수 필드 유효성 검사
-        if (product.getName() == null || product.getName().isEmpty()) {
-            throw new IllegalArgumentException("상품 이름은 필수입니다.");
-        }
-        if (product.getCompanyId() == null || product.getCompanyId().isEmpty()) {
-            throw new IllegalArgumentException("회사 ID는 필수입니다.");
-        }
-        // 필요 시 추가 필수 필드 체크
-
+    public Products createProduct(Products product, String companyId) {
+        product.setCompanyId(companyId); // 꼭 필요
         return productsRepository.save(product);
     }
 
-    public Products updateProduct(String id, Products updatedProduct) {
-        return productsRepository.findById(id).map(existingProduct -> {
-            existingProduct.setName(updatedProduct.getName());
-            existingProduct.setDescription(updatedProduct.getDescription());
-            existingProduct.setCategoryId(updatedProduct.getCategoryId());
-            existingProduct.setMainImage(updatedProduct.getMainImage());
-            existingProduct.setDescriptionImage(updatedProduct.getDescriptionImage());
-            existingProduct.setExtensionList(updatedProduct.getExtensionList());
-            existingProduct.setAttachmentId(updatedProduct.getAttachmentId()); // 새 컬럼도 추가
-            return productsRepository.save(existingProduct);
-        }).orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+    public Products updateProduct(String productId, Products updatedProduct) {
+        Products existing = productsRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
+        existing.setName(updatedProduct.getName());
+        existing.setDescription(updatedProduct.getDescription());
+        existing.setMainImage(updatedProduct.getMainImage());
+        existing.setDescriptionImage(updatedProduct.getDescriptionImage());
+        existing.setExtensionList(updatedProduct.getExtensionList());
+        existing.setAttachmentId(updatedProduct.getAttachmentId());
+        existing.setCategoryId(updatedProduct.getCategoryId());
+
+        return productsRepository.save(existing);
     }
 
-    @Transactional
-    public void deleteProduct(String id) {
-        productsRepository.deleteById(id);
+    public void deleteProduct(String productId) {
+        Products product = productsRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
+        productsRepository.delete(product);
     }
-
 }
