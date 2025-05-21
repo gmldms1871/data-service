@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -20,10 +21,8 @@ public class Products {
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "id", updatable = false, nullable = false, length = 100)
+    @Column(name = "id", length = 100)
     private String id;
-
-    private Integer price;
 
     @Column(name = "company_id", length = 100)
     private String companyId;
@@ -40,6 +39,10 @@ public class Products {
     @JoinColumn(name = "category_id", insertable = false, updatable = false)
     @JsonIgnore
     private Category category;
+
+    @OneToMany(mappedBy = "product")
+    @JsonIgnore
+    private List<ProductTag> productTags;
 
     @Column(name = "main_image", length = 255)
     private String mainImage;
@@ -59,10 +62,10 @@ public class Products {
     @Column(name = "attachment_id", length = 100)
     private String attachmentId;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = true, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
@@ -70,6 +73,9 @@ public class Products {
 
     @PrePersist
     protected void onCreate() {
+        if (this.id == null || this.id.isEmpty()) {
+            this.id = UUID.randomUUID().toString();
+        }
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

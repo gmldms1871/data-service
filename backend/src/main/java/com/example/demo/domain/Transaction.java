@@ -2,6 +2,8 @@ package com.example.demo.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
 public class Transaction {
 
     @Id
+    @GeneratedValue
+    @UuidGenerator
     @Column(name = "id", length = 100)
     private String id; // 거래 고유 ID
 

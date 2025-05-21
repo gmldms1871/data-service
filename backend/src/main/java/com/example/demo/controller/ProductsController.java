@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.domain.Products;
-import com.example.demo.dto.ResponseDto;
 import com.example.demo.service.ProductsService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,90 +8,75 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductsController {
 
+    private final ProductsService productsService;
+
     @Autowired
-    private ProductsService productsService;
+    public ProductsController(ProductsService productsService) {
+        this.productsService = productsService;
+    }
 
-    // 전체 상품 조회
+    // 전체 상품 목록 + companyId 필터링
     @GetMapping
-    public ResponseEntity<ResponseDto<?>> getAllProducts(HttpSession session) {
-        String loginCompanyId = (String) session.getAttribute("loginCompanyId");
-        if (loginCompanyId == null) {
-            return ResponseEntity.status(401)
-                    .body(new ResponseDto<>(false, "로그인이 필요합니다", null));
+    public ResponseEntity<List<Products>> getAllProducts(@RequestParam(required = false) String companyId) {
+        if (companyId != null) {
+            return ResponseEntity.ok(productsService.getProductsByCompanyId(companyId));
+        } else {
+            return ResponseEntity.ok(productsService.getAllProducts());
         }
-
-        List<Products> products = productsService.getAllProducts();
-        return ResponseEntity.ok(new ResponseDto<>(true, "전체 상품 조회 성공", products));
     }
 
-    // 단일 상품 조회
+    // 특정 상품 상세 조회
     @GetMapping("/{productId}")
-    public ResponseEntity<ResponseDto<Products>> getProductById(@PathVariable String productId, HttpSession session) {
-        String loginCompanyId = (String) session.getAttribute("loginCompanyId");
-        if (loginCompanyId == null) {
-            return ResponseEntity.status(401)
-                    .body(new ResponseDto<>(false, "로그인이 필요합니다", null));
-        }
-
+    public ResponseEntity<Products> getProductById(@PathVariable String productId) {
         return productsService.getProductById(productId)
-                .map(product -> ResponseEntity.ok(new ResponseDto<>(true, "상품 조회 성공", product)))
-                .orElseGet(() -> ResponseEntity.status(404)
-                        .body(new ResponseDto<>(false, "상품을 찾을 수 없습니다", null)));
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // 상품 등록
+    // 상품 등록 (세션 기반 companyId)
     @PostMapping
-    public ResponseEntity<ResponseDto<?>> createProduct(@RequestBody Products product, HttpSession session) {
+    public ResponseEntity<Products> createProduct(@RequestBody Products product, HttpSession session) {
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
-        if (loginCompanyId == null) {
-            return ResponseEntity.status(401)
-                    .body(new ResponseDto<>(false, "로그인이 필요합니다", null));
-        }
-
-        Products created = productsService.createProduct(product, loginCompanyId);
-        return ResponseEntity.ok(new ResponseDto<>(true, "상품 등록 성공", created));
+        if (loginCompanyId == null) return ResponseEntity.status(401).build();
+        product.setCompanyId(loginCompanyId);
+        return ResponseEntity.ok(productsService.createProduct(product));
     }
 
-    // 상품 수정
-    @PatchMapping("/{productId}")
-    public ResponseEntity<ResponseDto<?>> updateProduct(@PathVariable String productId,
-                                                        @RequestBody Products product,
-                                                        HttpSession session) {
-        String loginCompanyId = (String) session.getAttribute("loginCompanyId");
-        if (loginCompanyId == null) {
-            return ResponseEntity.status(401)
-                    .body(new ResponseDto<>(false, "로그인이 필요합니다", null));
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable String id,
+                                           @RequestBody Products updatedProduct,
+                                           HttpSession session) {
+        String sessionCompanyId = (String) session.getAttribute("loginCompanyId");
+        if (sessionCompanyId == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
         }
 
         try {
-            Products updated = productsService.updateProduct(productId, product);
-            return ResponseEntity.ok(new ResponseDto<>(true, "상품 수정 성공", updated));
+            Products result = productsService.updateProduct(id, updatedProduct, sessionCompanyId);
+            return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404)
-                    .body(new ResponseDto<>(false, e.getMessage(), null));
+            return ResponseEntity.status(403).body(e.getMessage());
         }
     }
 
-    // 상품 삭제
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<ResponseDto<?>> deleteProduct(@PathVariable String productId, HttpSession session) {
-        String loginCompanyId = (String) session.getAttribute("loginCompanyId");
-        if (loginCompanyId == null) {
-            return ResponseEntity.status(401)
-                    .body(new ResponseDto<>(false, "로그인이 필요합니다", null));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable String id, HttpSession session) {
+        String sessionCompanyId = (String) session.getAttribute("loginCompanyId");
+        if (sessionCompanyId == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
         }
 
         try {
-            productsService.deleteProduct(productId);
-            return ResponseEntity.ok(new ResponseDto<>(true, "상품 삭제 성공", null));
-        } catch (Exception e) {
-            return ResponseEntity.status(404)
-                    .body(new ResponseDto<>(false, "상품 삭제 실패: " + e.getMessage(), null));
+            productsService.deleteProduct(id, sessionCompanyId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
         }
     }
 }
