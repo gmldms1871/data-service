@@ -1,5 +1,6 @@
 package com.example.demo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -31,13 +32,16 @@ public class Products {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", insertable = false, updatable = false)
+    @JsonIgnore
     private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    @JsonIgnore
     private Category category;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<ProductTag> productTags;
 
     @Column(name = "main_image", length = 255)
@@ -49,7 +53,7 @@ public class Products {
     @Column(name = "extension_list", columnDefinition = "TEXT")
     private String extensionList;
 
-    @Column(name = "name", length = 100)  // nullable = false 제거
+    @Column(name = "name", length = 100)
     private String name;
 
     @Column(name = "description", columnDefinition = "TEXT")

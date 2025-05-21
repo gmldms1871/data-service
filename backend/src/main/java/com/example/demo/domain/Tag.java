@@ -5,13 +5,12 @@ import lombok.*;
 
 @Entity
 @Table(name = "tags")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter @Setter
 public class Tag {
-
     @Id
-    @Column(name = "id", length = 100)
+    @Column(length = 100)
     private String id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(length = 100)
     private String name;
 }

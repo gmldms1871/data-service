@@ -36,7 +36,7 @@ server:
 business:
   api:
     url: https://api.odcloud.kr/api
-    key: MuirA%2ByYBHsqUdjiGlNbs+JNsFyXVy9wbcHJkIR0i40cWLrcyUS7Kz3hMxXfCdxNq9Ek/ZkFClbfzjQjEOF4FQ==
+    key: qZr4u3Ge5YPzlN5w1VHI81S2AWGlUvKhDB8Jw5N0httR6FAqIznbTGuNGXG7LEnt2MKo7MdP2xu2CxH/wn8opw==
 
 logging:
   level:

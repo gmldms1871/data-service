@@ -41,6 +41,7 @@ public class CompanyController {
 
         if (company.isPresent()) {
             session.setAttribute("loginCompanyId", company.get().getId());
+            System.out.println("세션 생성됨, ID = " + session.getId()); // 👈 추가
             return ResponseEntity.ok("로그인 성공");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");

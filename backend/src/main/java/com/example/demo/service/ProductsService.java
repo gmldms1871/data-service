@@ -9,56 +9,65 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import java.util.UUID;
-
 @Service
 public class ProductsService {
 
-    @Autowired
-    private ProductsRepository productsRepository;
+    private final ProductsRepository productsRepository;
 
+    @Autowired
+    public ProductsService(ProductsRepository productsRepository) {
+        this.productsRepository = productsRepository;
+    }
+
+    // 전체 조회
     public List<Products> getAllProducts() {
         return productsRepository.findAll();
     }
 
+    // 특정 상품 ID로 조회
     public Optional<Products> getProductById(String id) {
         return productsRepository.findById(id);
     }
 
+    // 특정 회사의 상품 조회
+    public List<Products> getProductsByCompanyId(String companyId) {
+        return productsRepository.findAllByCompanyId(companyId);
+    }
 
+    @Transactional
     public Products createProduct(Products product) {
-        if (product.getId() == null || product.getId().isEmpty()) {
-            product.setId(UUID.randomUUID().toString());
+        return productsRepository.save(product);
+    }
+
+    @Transactional
+    public Products updateProduct(String id, Products newProduct, String sessionCompanyId) {
+        Products product = productsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        if (!product.getCompanyId().equals(sessionCompanyId)) {
+            throw new RuntimeException("권한이 없습니다.");
         }
 
-        // 필수 필드 유효성 검사
-        if (product.getName() == null || product.getName().isEmpty()) {
-            throw new IllegalArgumentException("상품 이름은 필수입니다.");
-        }
-        if (product.getCompanyId() == null || product.getCompanyId().isEmpty()) {
-            throw new IllegalArgumentException("회사 ID는 필수입니다.");
-        }
-        // 필요 시 추가 필수 필드 체크
+        product.setName(newProduct.getName());
+        product.setDescription(newProduct.getDescription());
+        product.setCategoryId(newProduct.getCategoryId());
+        product.setMainImage(newProduct.getMainImage());
+        product.setDescriptionImage(newProduct.getDescriptionImage());
+        product.setExtensionList(newProduct.getExtensionList());
+        product.setAttachmentId(newProduct.getAttachmentId());
 
         return productsRepository.save(product);
     }
 
-    public Products updateProduct(String id, Products updatedProduct) {
-        return productsRepository.findById(id).map(existingProduct -> {
-            existingProduct.setName(updatedProduct.getName());
-            existingProduct.setDescription(updatedProduct.getDescription());
-            existingProduct.setCategoryId(updatedProduct.getCategoryId());
-            existingProduct.setMainImage(updatedProduct.getMainImage());
-            existingProduct.setDescriptionImage(updatedProduct.getDescriptionImage());
-            existingProduct.setExtensionList(updatedProduct.getExtensionList());
-            existingProduct.setAttachmentId(updatedProduct.getAttachmentId()); // 새 컬럼도 추가
-            return productsRepository.save(existingProduct);
-        }).orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
-    }
-
     @Transactional
-    public void deleteProduct(String id) {
-        productsRepository.deleteById(id);
-    }
+    public void deleteProduct(String id, String sessionCompanyId) {
+        Products product = productsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
+        if (!product.getCompanyId().equals(sessionCompanyId)) {
+            throw new RuntimeException("권한이 없습니다.");
+        }
+
+        productsRepository.delete(product);
+    }
 }
