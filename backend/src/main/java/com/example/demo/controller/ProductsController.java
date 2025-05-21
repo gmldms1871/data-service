@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -69,14 +70,14 @@ public class ProductsController {
     public ResponseEntity<?> deleteProduct(@PathVariable String id, HttpSession session) {
         String sessionCompanyId = (String) session.getAttribute("loginCompanyId");
         if (sessionCompanyId == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "로그인이 필요합니다."));
         }
 
         try {
             productsService.deleteProduct(id, sessionCompanyId);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(Map.of("success", true, "message", "상품이 삭제되었습니다."));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(403).body(e.getMessage());
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 }
