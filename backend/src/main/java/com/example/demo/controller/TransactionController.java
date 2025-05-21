@@ -72,10 +72,10 @@ public class TransactionController {
     }
 
     /**
-     * 판매자 확인
+     * 통합 로그인된 아이디로 거래완료버튼
      */
-    @PatchMapping("/{id}/seller-confirm")
-    public ResponseEntity<?> sellerConfirm(@PathVariable String id, HttpSession session) {
+    @PatchMapping("/{id}/confirm")
+    public ResponseEntity<?> confirmByLoginUser(@PathVariable String id, HttpSession session) {
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
         if (loginCompanyId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
@@ -83,33 +83,14 @@ public class TransactionController {
             ));
         }
 
-        transactionService.confirm(id, "seller", loginCompanyId);
+        transactionService.confirmByLoginUser(id, loginCompanyId);
 
         return ResponseEntity.ok(Map.of(
-                "message", "판매자 확인 완료",
+                "message", "확인 완료",
                 "transactionId", id
         ));
     }
 
-    /**
-     * 구매자 확인
-     */
-    @PatchMapping("/{id}/buyer-confirm")
-    public ResponseEntity<?> buyerConfirm(@PathVariable String id, HttpSession session) {
-        String loginCompanyId = (String) session.getAttribute("loginCompanyId");
-        if (loginCompanyId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                    "error", "로그인 정보가 없습니다."
-            ));
-        }
-
-        transactionService.confirm(id, "buyer", loginCompanyId);
-
-        return ResponseEntity.ok(Map.of(
-                "message", "구매자 확인 완료",
-                "transactionId", id
-        ));
-    }
 
     /**
      * 거래 삭제 (소프트 삭제)

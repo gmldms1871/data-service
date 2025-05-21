@@ -32,6 +32,12 @@ mybatis:
 server:
   port: 4601
 
+# 사업자등록번호 진위확인 API 설정
+business:
+  api:
+    url: https://api.odcloud.kr/api
+    key: qZr4u3Ge5YPzlN5w1VHI81S2AWGlUvKhDB8Jw5N0httR6FAqIznbTGuNGXG7LEnt2MKo7MdP2xu2CxH/wn8opw==
+
 logging:
   level:
     org.springframework: INFO

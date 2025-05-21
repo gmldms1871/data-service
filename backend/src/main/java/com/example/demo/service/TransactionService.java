@@ -40,31 +40,42 @@ public class TransactionService {
     }
 
     /**
-     * 거래 완료 버튼 클릭 (buyer 또는 seller만 가능)
+     * 거래 완료 버튼 클릭 (로그인 된 아이디)
      */
-    public void confirm(String id, String role, String userId) {
-        Transaction tx = transactionRepository.findById(id)
+    public void confirmByLoginUser(String transactionId, String loginCompanyId) {
+        Transaction tx = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("거래를 찾을 수 없습니다."));
 
-        if (!userId.equals(tx.getBuyerId()) && !userId.equals(tx.getSellerId())) {
+        String buyerCompanyId = null;
+
+        if (tx.getBuyerId() != null) {
+            Inquiries buyerInquiry = inquiriesRepository.findById(tx.getBuyerId())
+                    .orElseThrow(() -> new RuntimeException("buyerId에 해당하는 문의 정보를 찾을 수 없습니다."));
+            buyerCompanyId = buyerInquiry.getCompanyId();
+        }
+
+        // seller는 직접 비교, buyer는 inquries -> companyId로 역추적
+        boolean isBuyer = loginCompanyId.equals(buyerCompanyId);
+        boolean isSeller = loginCompanyId.equals(tx.getSellerId());
+
+        if (!isBuyer && !isSeller) {
             throw new RuntimeException("이 거래에 대한 권한이 없습니다.");
         }
 
-        if ("buyer".equalsIgnoreCase(role)) {
-            tx.setBuyerConfirmed(true);
-        } else if ("seller".equalsIgnoreCase(role)) {
-            tx.setSellerConfirmed(true);
-        } else {
-            throw new RuntimeException("role 파라미터는 'buyer' 또는 'seller'여야 합니다.");
-        }
+        // 확인 처리
+        if (isBuyer) tx.setBuyerConfirmed(true);
+        if (isSeller) tx.setSellerConfirmed(true);
 
-        // 🔽 상태 판단 추가
-        if (Boolean.TRUE.equals(tx.getBuyerConfirmed()) && Boolean.TRUE.equals(tx.getSellerConfirmed())) {
+        // 거래 상태 갱신 로직
+        boolean buyer = Boolean.TRUE.equals(tx.getBuyerConfirmed());
+        boolean seller = Boolean.TRUE.equals(tx.getSellerConfirmed());
+
+        if (buyer && seller) {
             tx.setStatus(Transaction.Status.confirmed);
-        } else if (Boolean.TRUE.equals(tx.getBuyerConfirmed()) || Boolean.TRUE.equals(tx.getSellerConfirmed())) {
-            tx.setStatus(Transaction.Status.pending); // ✅ 한 명만 확인 → pending
+        } else if (buyer || seller) {
+            tx.setStatus(Transaction.Status.pending);
         } else {
-            tx.setStatus(Transaction.Status.cancelled); // ✅ 아무도 확인 안 하면 cancelled
+            tx.setStatus(Transaction.Status.cancelled);
         }
 
         transactionRepository.save(tx);
