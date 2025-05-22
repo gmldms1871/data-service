@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ReviewDto;
 import com.example.demo.service.ReviewService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,29 +25,43 @@ public class ReviewController {
     @GetMapping
     public ResponseEntity<?> getReviews(
             @RequestParam(name = "productId", required = false) String productId,
-            @RequestParam(name = "companyId", required = false) String companyId) {
+            @RequestParam(name = "companyId", required = false) String companyId,
+            HttpSession session) {
 
         if (productId != null) {
             List<ReviewDto> reviews = reviewService.getReviewsByProductId(productId);
-            System.out.println("Company Reviews: " + reviews);  // 리뷰 리스트 출력
-            return ResponseEntity.ok(reviews);  // 제품 ID로 조회
-        } else if (companyId != null) {
-            List<ReviewDto> reviews = reviewService.getReviewsByCompanyId(companyId);
-            System.out.println("Company Reviews: " + reviews);  // 리뷰 리스트 출력
-            return ResponseEntity.ok(reviews);  // 기업 ID로 조회
-        } else {
-            return ResponseEntity.badRequest().body("productId 또는 companyId 중 하나는 필수입니다.");
+            System.out.println("Product Reviews: " + reviews);
+            return ResponseEntity.ok(reviews);
         }
+
+        // ❗ companyId 파라미터가 없으면 로그인 정보로 대체
+        if (companyId == null) {
+            companyId = (String) session.getAttribute("loginCompanyId");
+            if (companyId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+        }
+
+        List<ReviewDto> reviews = reviewService.getReviewsByCompanyId(companyId);
+        System.out.println("Company Reviews: " + reviews);
+        return ResponseEntity.ok(reviews);
     }
 
 
     // 리뷰 작성 (거래 ID로 유효성 검증 후)
     @PostMapping
-    public ResponseEntity<?> createReview(@RequestBody ReviewDto dto) {
+    public ResponseEntity<?> createReview(@RequestBody ReviewDto dto, HttpSession session) {
         System.out.println("Received ReviewDto: " + dto);  // 로그 출력
+
         dto.setId(UUID.randomUUID().toString());
-        // `createdAt` 필드를 현재 시간으로 자동 설정
         dto.setCreatedAt(LocalDateTime.now());
+
+        // ✅ 로그인 세션에서 companyId 추출하여 dto에 설정
+        String loginCompanyId = (String) session.getAttribute("loginCompanyId");
+        if (loginCompanyId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+        dto.setCompanyId(loginCompanyId);
 
         try {
             reviewService.createReview(dto, dto.getTransactionId());  // 거래 ID로 유효성 체크 후 리뷰 작성
@@ -76,7 +91,6 @@ public class ReviewController {
         reviewService.updateReview(dto);
         return ResponseEntity.ok("리뷰가 수정되었습니다.");
     }
-
 
     // 리뷰 삭제
     @DeleteMapping("/{id}")

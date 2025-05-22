@@ -24,6 +24,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 	// MySQL 드라이버 수정 - 기존 버전이 호환성 문제가 있을 수 있음
 	implementation 'com.mysql:mysql-connector-j:8.3.0'
