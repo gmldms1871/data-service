@@ -37,6 +37,12 @@ public class ReviewServiceImpl implements ReviewService {
         if (!isConfirmed) {
             throw new IllegalStateException("리뷰를 작성할 수 있는 거래가 아닙니다.");
         }
+
+        String buyerCompanyId = transactionMapper.getCompanyIdFromBuyerInquiry(transactionId);
+        if (!dto.getCompanyId().equals(buyerCompanyId)) {
+            throw new IllegalStateException("해당 거래의 구매자만 리뷰를 작성할 수 있습니다.");
+        }
+
         reviewMapper.insertReview(dto);
     }
 
@@ -61,8 +67,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteReview(String id) {
-        reviewMapper.deleteReview(id);
+    public int deleteReview(String id) {
+        return reviewMapper.deleteReview(id); // 삭제된 행 수 리턴
     }
 
     // 🔄 변경된 부분: SqlSession 제거, Mapper 직접 호출

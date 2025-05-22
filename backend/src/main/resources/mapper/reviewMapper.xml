@@ -35,10 +35,12 @@
     </select>
 
     <!-- 리뷰 등록 -->
+    <!-- 리뷰 등록 -->
     <insert id="insertReview" parameterType="com.example.demo.dto.ReviewDto">
         INSERT INTO reviews (id, product_id, company_id, transaction_id, rating, review, created_at)
-        VALUES (#{id}, #{productId}, #{companyId}, #{transactionId}, #{rating}, #{review}, CURRENT_TIMESTAMP)
+        VALUES (#{id}, #{productId}, #{companyId}, #{transactionId}, #{rating}, #{review}, #{createdAt})
     </insert>
+
 
     <!-- 리뷰 수정 -->
     <update id="updateReview" parameterType="com.example.demo.dto.ReviewDto">
@@ -48,9 +50,10 @@
     </update>
 
     <!-- 리뷰 삭제 -->
-    <delete id="deleteReview" parameterType="String">
+    <delete id="deleteReview" parameterType="string">
         DELETE FROM reviews WHERE id = #{id}
     </delete>
+
 </mapper>
 
 
