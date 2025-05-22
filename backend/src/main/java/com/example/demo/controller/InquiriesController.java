@@ -37,20 +37,18 @@ public class InquiriesController {
         } catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-
-
     }
 
     // GET /api/inquiries?productId=xxx
     // 특정 상품의 문의 목록을 반환
-    @GetMapping("/productId")
+    @GetMapping("/product")
     public ResponseEntity<?> getInquiriesProductId(@RequestParam String productId, HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
-
-        List<Inquiries> list = inquiriesService.findByCompanyIdAndProductId(productId, companyId);
+        System.out.println("ddd"+ companyId + "  " + productId);
+            List<Inquiries> list = inquiriesService.findByCompanyIdAndProductId(companyId, productId);
         return ResponseEntity.ok(list); // 200 OK
     }
 
