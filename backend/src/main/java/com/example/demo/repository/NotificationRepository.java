@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, String> {
-    // 엔티티 필드명 receiverId에 맞게 수정
     List<Notification> findByReceiverId(String receiverId);
+    List<Notification> findBySenderId(String senderId);  // 발신자 ID로 조회 추가
 }
