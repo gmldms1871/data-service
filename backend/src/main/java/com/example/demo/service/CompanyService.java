@@ -44,6 +44,13 @@ public class CompanyService {
 
         if (companyOpt.isPresent()) {
             Company company = companyOpt.get();
+
+            // 1. 먼저 평문 비밀번호 비교 (기존 데이터 지원)
+            if (password.equals(company.getPassword())) {
+                return Optional.of(CompanyDto.fromEntity(company));
+            }
+
+            // 2. 암호화된 비밀번호 비교 (새로운 데이터 지원)
             if (passwordEncoder.matches(password, company.getPassword())) {
                 return Optional.of(CompanyDto.fromEntity(company));
             }
