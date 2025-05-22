@@ -95,7 +95,10 @@ public class ReviewController {
     // 리뷰 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteReview(@PathVariable("id") String id) {
-        reviewService.deleteReview(id);  // 리뷰 삭제
+        int deleted = reviewService.deleteReview(id);
+        if (deleted == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("리뷰를 찾을 수 없습니다.");
+        }
         return ResponseEntity.ok("리뷰가 삭제되었습니다.");
     }
 }

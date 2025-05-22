@@ -10,6 +10,6 @@ public interface ReviewMapper {
     List<ReviewDto> findByCompanyId(String companyId);  // 회사 ID로 리뷰 조회
     void insertReview(ReviewDto reviewDto);  // 리뷰 등록
     void updateReview(ReviewDto dto);  // 리뷰 수정
-    void deleteReview(String id);  // 리뷰 삭제
+    int deleteReview(String id);  // 리뷰 삭제
     ReviewDto findById(String id);
 }

@@ -8,8 +8,13 @@
     </select>
 
     <select id="getBuyerConfirmed" parameterType="string" resultType="int">
-        SELECT buyer_confirmed
-        FROM transaction
-        WHERE id = #{transactionId}
+        SELECT buyer_confirmed FROM transaction WHERE id = #{transactionId}
+    </select>
+
+    <select id="getCompanyIdFromBuyerInquiry" parameterType="string" resultType="string">
+        SELECT i.company_id
+        FROM transaction t
+                 JOIN inquiries i ON t.buyer_id = i.id
+        WHERE t.id = #{transactionId}
     </select>
 </mapper>
