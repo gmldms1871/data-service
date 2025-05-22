@@ -19,6 +19,8 @@ import org.hibernate.annotations.UuidGenerator;
 public class Inquiries {
 
     @Id
+    @GeneratedValue
+    @UuidGenerator
     @Column(name = "id", length = 100)
     private String id;
 
@@ -50,7 +52,3 @@ public class Inquiries {
 //  "description": "문의 내용",
 //  "attachmentId": null
 //}
-
-/**
- * multi part
- */
