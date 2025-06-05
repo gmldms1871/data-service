@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.ChatRoomMapper">
+
+    <select id="findByTransaction" parameterType="string" resultType="com.example.demo.dto.ChatRoomDto">
+        SELECT *
+        FROM chat_rooms
+        WHERE transaction_id = #{transactionId}
+    </select>
+
+    <insert id="insertRoom" parameterType="com.example.demo.dto.ChatRoomDto">
+        INSERT INTO chat_rooms (
+            id, transaction_id, buyer_id, seller_id, name, created_at
+        ) VALUES (
+                     #{id}, #{transactionId}, #{buyerId}, #{sellerId}, #{name}, #{createdAt}
+                 )
+    </insert>
+
+    <select id="findBuyerSellerByTransactionId" parameterType="string" resultType="map">
+        SELECT i.company_id AS buyerId,
+               p.company_id AS sellerId
+        FROM transaction t
+                 JOIN inquiries i ON t.buyer_id = i.id
+                 JOIN products p ON t.product_id = p.id
+        WHERE t.id = #{transactionId}
+    </select>
+
+    <select id="findRoomsByCompanyId" resultType="com.example.demo.dto.ChatRoomDto">
+        SELECT *
+        FROM chat_rooms
+        WHERE buyer_id = #{companyId}
+           OR seller_id = #{companyId}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 각 채팅방의 안 읽은 메시지 수 -->
+    <select id="countUnreadMessages" resultType="int">
+        SELECT COUNT(*)
+        FROM chat_messages
+        WHERE room_id = #{roomId}
+          AND sender_id != #{companyId}
+          AND is_read = 0
+    </select>
+
+</mapper>

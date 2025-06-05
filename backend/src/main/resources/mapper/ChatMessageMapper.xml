@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.ChatMessageMapper">
+
+    <resultMap id="ChatMessageResultMap" type="com.example.demo.dto.ChatMessageDto">
+        <result column="id" property="id"/>
+        <result column="room_id" property="roomId"/>
+        <result column="sender_id" property="senderId"/>
+        <result column="message" property="message"/>
+        <result column="sent_at" property="sentAt"/>
+        <result column="is_read" property="read"/>
+        <result column="attachment_id" property="attachmentId"/>
+        <result column="read_by_id" property="readById"/>
+    </resultMap>
+
+    <!-- 채팅방 접근 권한 확인 -->
+    <select id="countRoomAccess" resultType="int">
+        SELECT COUNT(*) FROM chat_rooms
+        WHERE id = #{roomId}
+          AND (buyer_id = #{companyId} OR seller_id = #{companyId})
+    </select>
+
+    <!-- 읽지 않은 메시지를 읽음 처리 -->
+    <update id="updateReadMessages">
+        UPDATE chat_messages
+        SET is_read = 1,
+            read_by_id = #{readerId}
+        WHERE room_id = #{roomId}
+          AND sender_id != #{readerId}
+          AND is_read = 0
+    </update>
+
+    <!-- 특정 채팅방의 모든 메시지 조회 -->
+    <select id="findMessagesByRoomId" resultMap="ChatMessageResultMap">
+        SELECT * FROM chat_messages WHERE room_id = #{roomId} ORDER BY sent_at ASC
+    </select>
+
+
+    <!-- 채팅 메시지 저장 -->
+    <insert id="insertMessage" parameterType="com.example.demo.dto.ChatMessageDto">
+        INSERT INTO chat_messages (
+            id, room_id, sender_id, message,
+            sent_at, is_read, attachment_id, read_by_id
+        )
+        VALUES (
+                   #{id}, #{roomId}, #{senderId}, #{message},
+                   #{sentAt}, #{read}, #{attachmentId}, #{readById}
+               )
+    </insert>
+
+</mapper>
