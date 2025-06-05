@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Optional;
 
 
 @Service
@@ -34,6 +34,10 @@ public class AttachmentService {
         String storedFileName = originalFilename;
         String filePath = uploadDir + storedFileName;
 
+        if (!new File(filePath).exists()) {
+            new File(filePath).mkdirs();
+        }
+
         // 저장
         file.transferTo(new File(filePath));
 
@@ -47,7 +51,9 @@ public class AttachmentService {
         return attachmentRepository.save(attachment);
     }
 
-    public List<Attachment> findByIds(List<String> ids) {
-        return attachmentRepository.findAllById(ids);
+    public Attachment findById(String id) {
+        Optional<Attachment> attachment = attachmentRepository.findById(id);
+        if (attachment.isPresent()) return attachment.get();
+        else throw new RuntimeException("Attachment not found");
     }
 }
