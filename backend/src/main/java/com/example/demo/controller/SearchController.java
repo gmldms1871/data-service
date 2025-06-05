@@ -18,7 +18,7 @@ public class SearchController {
 
     private final SearchService searchService;
 
-    @GetMapping
+    @GetMapping ("/readMany")
     public ResponseEntity<List<SearchResult>> search(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String category,

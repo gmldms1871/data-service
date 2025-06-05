@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/api/transaction")
 @RequiredArgsConstructor
 public class TransactionController {
 
@@ -21,7 +21,7 @@ public class TransactionController {
     /**
      * 거래 생성
      */
-    @PostMapping
+    @PostMapping ("/create")
     public ResponseEntity<?> create(@RequestBody Transaction tx, HttpSession session) {
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
         if (loginCompanyId == null) {
@@ -42,7 +42,7 @@ public class TransactionController {
     /**
      * 거래 전체 조회 (판매자 기준)
      */
-    @GetMapping
+    @GetMapping("/readMany")
     public ResponseEntity<?> getMyTransactions(HttpSession session) {
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
         if (loginCompanyId == null) {
@@ -63,7 +63,7 @@ public class TransactionController {
     /**
      * 거래 단건 조회
      */
-    @GetMapping("/{id}")
+    @GetMapping("/readOne/{id}")
     public ResponseEntity<?> getTransaction(@PathVariable String id) {
         return ResponseEntity.ok(Map.of(
                 "message", "거래 상세 조회 성공",
@@ -74,7 +74,7 @@ public class TransactionController {
     /**
      * 통합 로그인된 아이디로 거래완료버튼
      */
-    @PatchMapping("/{id}/confirm")
+    @PatchMapping("/update/confirm/{id}")
     public ResponseEntity<?> confirmByLoginUser(@PathVariable String id, HttpSession session) {
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
         if (loginCompanyId == null) {
@@ -95,7 +95,7 @@ public class TransactionController {
     /**
      * 거래 삭제 (소프트 삭제)
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable String id, HttpSession session) {
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
         if (loginCompanyId == null) {
@@ -115,7 +115,7 @@ public class TransactionController {
     /**
      * 거래 유효성 확인 (리뷰 작성 등)
      */
-    @GetMapping("/{id}/validate")
+    @GetMapping("/readOne/validate/{id}")
     public ResponseEntity<?> validateTransaction(@PathVariable String id, HttpSession session) {
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
         if (loginCompanyId == null) {
