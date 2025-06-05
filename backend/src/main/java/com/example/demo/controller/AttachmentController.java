@@ -26,7 +26,7 @@ public class AttachmentController {
     private AttachmentService attachmentService;
 
     // 첨부파일 실제 업로드 처리
-    @PostMapping("/upload")
+    @PostMapping("/create")
     public Attachment upload(@RequestParam("file") MultipartFile file) throws IOException {
         return attachmentService.saveFile(file);
     }

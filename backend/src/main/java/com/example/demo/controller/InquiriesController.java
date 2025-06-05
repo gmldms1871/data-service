@@ -16,7 +16,7 @@ public class InquiriesController {
 
     @Autowired
     private InquiriesService inquiriesService;
-  
+
     // POST /api/inquiries
     // 클라이언트로부터 문의 내용을 받아 생성
     // todo 프론트(https param)에서 제품 id 받아와서 작성하게 //null 허용 제외
@@ -25,7 +25,7 @@ public class InquiriesController {
     // 2. bean에 임시 저장?
     // 3.
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<?> createInquiries(@RequestBody Inquiries inquiries, HttpSession session) {
 
         String companyId = (String) session.getAttribute("loginCompanyId");
@@ -46,7 +46,7 @@ public class InquiriesController {
 
     // GET /api/inquiries?productId=xxx
     // 특정 상품의 문의 목록을 반환
-    @GetMapping("/product")
+    @GetMapping("/product/readMany")
     public ResponseEntity<?> getInquiriesProductId(@RequestParam String productId, HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {
@@ -59,7 +59,7 @@ public class InquiriesController {
 
     // GET /api/inquiries?companyId=xxx
     // 문의한 기업의 문의 목록을 반환
-    @GetMapping("/me")
+    @GetMapping("/readMany")
     public ResponseEntity<?> getInquiriesCompanyId(HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {
