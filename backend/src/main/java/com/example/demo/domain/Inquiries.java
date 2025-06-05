@@ -40,15 +40,5 @@ public class Inquiries {
 
     private LocalDateTime editAddDate; // 문의 등록일시
 
-
 }
-//http://localhost:4601/api/inquiries?productId=1
 
-//{
-//  "companyId": "1",
-//  "productId": 1,
-//  "budget": 5000,
-//  "message": "문의 제목",
-//  "description": "문의 내용",
-//  "attachmentId": null
-//}

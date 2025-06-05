@@ -81,15 +81,4 @@ public class InquiriesService {
 }
 
 
-// attachmentId가 없으면 UUID 생성하여 attachmentId에 할당
-//        if (inquiries.getAttachmentId() == null || inquiries.getAttachmentId().isEmpty()) {
-//        inquiries.setAttachmentId(null);  // attachmentId가 없으면 null로 설정
-//        }
-//
-//                // editAddDate 설정
-//                if (inquiries.getEditAddDate() == null) {
-//        inquiries.setEditAddDate(LocalDateTime.now());
-//        }
-//
-//        return inquiriesRepository.save(inquiries);
 
