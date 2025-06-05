@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api/review")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -22,24 +22,18 @@ public class ReviewController {
     }
 
     // 리뷰 목록 조회 (제품 ID 또는 기업 ID로 조회)
-    @GetMapping
-    public ResponseEntity<?> getReviews(
-            @RequestParam(name = "productId", required = false) String productId,
-            @RequestParam(name = "companyId", required = false) String companyId,
-            HttpSession session) {
+    @GetMapping("/readMany/{productId}")
+    public ResponseEntity<?> getReviewsByProductId(@PathVariable String productId) {
+        List<ReviewDto> reviews = reviewService.getReviewsByProductId(productId);
+        System.out.println("Product Reviews: " + reviews);
+        return ResponseEntity.ok(reviews);
+    }
 
-        if (productId != null) {
-            List<ReviewDto> reviews = reviewService.getReviewsByProductId(productId);
-            System.out.println("Product Reviews: " + reviews);
-            return ResponseEntity.ok(reviews);
-        }
-
-        // ❗ companyId 파라미터가 없으면 로그인 정보로 대체
+    @GetMapping("/readMany")
+    public ResponseEntity<?> getReviewsByCompanyId(HttpSession session) {
+        String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {
-            companyId = (String) session.getAttribute("loginCompanyId");
-            if (companyId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
-            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
         List<ReviewDto> reviews = reviewService.getReviewsByCompanyId(companyId);
@@ -47,16 +41,15 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-
     // 리뷰 작성 (거래 ID로 유효성 검증 후)
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<?> createReview(@RequestBody ReviewDto dto, HttpSession session) {
         System.out.println("Received ReviewDto: " + dto);  // 로그 출력
 
         dto.setId(UUID.randomUUID().toString());
         dto.setCreatedAt(LocalDateTime.now());
 
-        // ✅ 로그인 세션에서 companyId 추출하여 dto에 설정
+        // 로그인 세션에서 companyId 추출하여 dto에 설정
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
         if (loginCompanyId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
@@ -72,7 +65,7 @@ public class ReviewController {
     }
 
     // 리뷰 수정
-    @PatchMapping("/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<?> updateReview(@PathVariable("id") String id, @RequestBody ReviewDto dto) {
         // 기존 리뷰를 DB에서 가져옴
         ReviewDto existing = reviewService.getReviewById(id);
@@ -93,7 +86,7 @@ public class ReviewController {
     }
 
     // 리뷰 삭제
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteReview(@PathVariable("id") String id) {
         int deleted = reviewService.deleteReview(id);
         if (deleted == 0) {

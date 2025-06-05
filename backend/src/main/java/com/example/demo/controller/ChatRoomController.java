@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/chatrooms")
+@RequestMapping("/api/chatroom")
 @RequiredArgsConstructor
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
 
-    @PostMapping("/{transactionId}")
+    @PostMapping("/create/{transactionId}")
     public ResponseEntity<?> createChatRoom(@PathVariable String transactionId, HttpSession session) {
         String loginCompanyId = (String) session.getAttribute("loginCompanyId");
         if (loginCompanyId == null) {
@@ -32,7 +32,7 @@ public class ChatRoomController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/readMany")
     public ResponseEntity<?> getMyChatRooms(HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {

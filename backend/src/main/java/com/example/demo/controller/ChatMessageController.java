@@ -13,13 +13,13 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/chatmessages")
+@RequestMapping("/api/chatmessage")
 @RequiredArgsConstructor
 public class ChatMessageController {
 
     private final ChatMessageService chatMessageService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<?> sendMessage(@RequestBody ChatMessageDto dto, HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {
@@ -36,7 +36,7 @@ public class ChatMessageController {
         }
     }
 
-    @GetMapping("/{roomId}")
+    @GetMapping("/readMany/{roomId}")
     public ResponseEntity<?> getMessages(@PathVariable String roomId, HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {
