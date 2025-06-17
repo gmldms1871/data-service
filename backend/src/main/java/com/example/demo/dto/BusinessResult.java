@@ -1,15 +1,17 @@
 package com.example.demo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class BusinessResult {
-    private String b_no;
-    private String tax_type;
+
+    @JsonProperty("b_no")
+    private String businessNumber;
+
+    @JsonProperty("tax_type")
+    private String taxType;
 }
