@@ -1,9 +1,11 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.Company;
+import com.example.demo.domain.Notification;
 import com.example.demo.dto.CompanyDto;
 import com.example.demo.dto.CompanyRegistrationDto;
 import com.example.demo.repository.CompanyRepository;
+import com.example.demo.repository.NotificationRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +20,15 @@ import java.util.stream.Collectors;
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationRepository notificationRepository;
 
-    public CompanyService(CompanyRepository companyRepository, PasswordEncoder passwordEncoder) {
+    public CompanyService(
+            CompanyRepository companyRepository,
+            NotificationRepository notificationRepository, // ✅ 주입
+            PasswordEncoder passwordEncoder
+    ) {
         this.companyRepository = companyRepository;
+        this.notificationRepository = notificationRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -149,8 +157,25 @@ public class CompanyService {
 
         // 삭제 시간 기록
         company.setDeletedAt(LocalDateTime.now());
-
         companyRepository.save(company);
+
+        // 🔥 탈퇴한 사용자가 관련된 알림 정리
+        List<Notification> relatedNotifications =
+                notificationRepository.findBySenderIdOrReceiverId(id, id);
+
+        for (Notification notification : relatedNotifications) {
+            boolean senderDeleted = companyRepository.findById(notification.getSenderId())
+                    .map(c -> c.getDeletedAt() != null)
+                    .orElse(true); // 회사 없으면 true
+
+            boolean receiverDeleted = companyRepository.findById(notification.getReceiverId())
+                    .map(c -> c.getDeletedAt() != null)
+                    .orElse(true);
+
+            if (senderDeleted && receiverDeleted) {
+                notificationRepository.delete(notification);
+            }
+        }
     }
 
     public boolean existsByBusinessNumber(String businessNumber) {

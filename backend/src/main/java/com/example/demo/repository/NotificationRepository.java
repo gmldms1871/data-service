@@ -8,4 +8,5 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, String> {
     List<Notification> findByReceiverId(String receiverId);
     List<Notification> findBySenderId(String senderId);  // 발신자 ID로 조회 추가
+    List<Notification> findBySenderIdOrReceiverId(String senderId, String receiverId);
 }
