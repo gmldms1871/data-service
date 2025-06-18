@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,9 +138,9 @@ public class CompanyService {
         Company company = getCompanyById(id);
 
         // 개인정보 마스킹
-        company.setEmail("deleted_" + company.getId() + "@example.com");
+        company.setEmail("deleted_" + UUID.randomUUID() + "@example.com");
         company.setUserName("탈퇴한 사용자");
-        company.setUserPhone(null);
+        company.setUserPhone("");
         company.setNickname(null);
         company.setCompanyName("삭제된 기업");
         company.setBusinessNumber(null);
