@@ -23,14 +23,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public ChatRoomDto createOrGet(String transactionId, String loginCompanyId) {
         log.info("[createOrGet] 채팅방 확인 요청: transactionId={}, loginCompanyId={}", transactionId, loginCompanyId);
 
-        // 1. 기존 채팅방 있는지 확인
         ChatRoomDto room = mapper.findByTransaction(transactionId);
         if (room != null) {
             log.info("[createOrGet] 기존 채팅방 존재: roomId={}", room.getId());
             return room;
         }
 
-        // 2. 거래에서 buyer/seller 조회
         Map<String, String> buyerSellerMap = chatRoomMapper.findBuyerSellerByTransactionId(transactionId);
         if (buyerSellerMap == null) {
             log.warn("[createOrGet] 거래 정보 없음: transactionId={}", transactionId);
@@ -40,15 +38,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         String buyerId = buyerSellerMap.get("buyerId");
         String sellerId = buyerSellerMap.get("sellerId");
 
-        log.info("[createOrGet] 조회된 거래 참여자: buyerId={}, sellerId={}", buyerId, sellerId);
+        log.info("[createOrGet] 거래 참여자: buyerId={}, sellerId={}", buyerId, sellerId);
 
-        // 3. buyer만 채팅방 생성 가능
+        // 🚫 판매자는 생성 금지, 대신 접근은 허용
         if (!loginCompanyId.equals(buyerId)) {
-            log.warn("[createOrGet] 채팅방 생성 권한 없음: 요청자={}, buyerId={}", loginCompanyId, buyerId);
-            throw new IllegalArgumentException("채팅방을 생성할 권한이 없습니다.");
+            throw new IllegalStateException("채팅방이 아직 생성되지 않았습니다. 구매자만 채팅방을 시작할 수 있습니다.");
         }
 
-        // 4. 채팅방 생성
+        // ✅ 채팅방 생성
         ChatRoomDto newRoom = new ChatRoomDto();
         newRoom.setId(UUID.randomUUID().toString());
         newRoom.setTransactionId(transactionId);
@@ -62,6 +59,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         return newRoom;
     }
+
 
     @Override
     public List<ChatRoomDto> getMyChatRooms(String companyId) {

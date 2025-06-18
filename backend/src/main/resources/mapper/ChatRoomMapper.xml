@@ -44,4 +44,18 @@
           AND is_read = 0
     </select>
 
+    <select id="countRoomAccess" resultType="int">
+        SELECT COUNT(*)
+        FROM chat_rooms
+        WHERE id = #{roomId}
+          AND (buyer_id = #{companyId} OR seller_id = #{companyId})
+    </select>
+
+    <select id="findByRoomId" parameterType="string" resultType="com.example.demo.dto.ChatRoomDto">
+        SELECT *
+        FROM chat_rooms
+        WHERE id = #{roomId}
+    </select>
+
+
 </mapper>

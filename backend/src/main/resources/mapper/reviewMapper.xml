@@ -11,7 +11,7 @@
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
-    <select id="findById" parameterType="string" resultType="com.example.demo.dto.ReviewDto">
+    <select id="findById" parameterType="string" resultMap="reviewResultMap">
         SELECT
             id,
             product_id,
@@ -22,6 +22,13 @@
             created_at
         FROM reviews
         WHERE id = #{id}
+    </select>
+
+    <select id="existsByTransactionId" resultType="int">
+        SELECT EXISTS (
+            SELECT 1 FROM reviews
+            WHERE transaction_id = #{transactionId}
+        )
     </select>
 
     <!-- 제품 ID로 리뷰 조회 -->

@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ChatMessageMapper {
@@ -16,4 +17,6 @@ public interface ChatMessageMapper {
     void updateReadMessages(@Param("roomId") String roomId, @Param("readerId") String readerId);
 
     List<ChatMessageDto> findMessagesByRoomId(@Param("roomId") String roomId);
+
+    void markMessagesAsRead(Map<String, String> params);
 }

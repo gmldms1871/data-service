@@ -51,4 +51,13 @@
                )
     </insert>
 
+    <update id="markMessagesAsRead" parameterType="map">
+        UPDATE chat_messages
+        SET is_read = true
+        WHERE room_id = #{roomId}
+          AND sender_id != #{companyId}
+          AND is_read = false
+    </update>
+
+
 </mapper>

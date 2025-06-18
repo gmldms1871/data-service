@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ReviewDto;
+import com.example.demo.exception.review.InvalidTransactionException;
+import com.example.demo.exception.review.ReviewAlreadyExistsException;
+import com.example.demo.exception.review.UnauthorizedReviewAccessException;
 import com.example.demo.mapper.ReviewMapper;
 import com.example.demo.mapper.TransactionMapper;
 import org.springframework.stereotype.Service;
@@ -33,21 +36,26 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void createReview(ReviewDto dto, String transactionId) {
+        int exists = reviewMapper.existsByTransactionId(transactionId);
+        if (exists == 1) {
+            throw new ReviewAlreadyExistsException();
+        }
+
         boolean isConfirmed = isTransactionConfirmed(transactionId);
         if (!isConfirmed) {
-            throw new IllegalStateException("리뷰를 작성할 수 있는 거래가 아닙니다.");
+            throw new InvalidTransactionException();
         }
 
         String buyerCompanyId = transactionMapper.getCompanyIdFromBuyerInquiry(transactionId);
         if (!dto.getCompanyId().equals(buyerCompanyId)) {
-            throw new IllegalStateException("해당 거래의 구매자만 리뷰를 작성할 수 있습니다.");
+            throw new UnauthorizedReviewAccessException();
         }
 
         reviewMapper.insertReview(dto);
     }
 
     @Override
-    public void updateReview(ReviewDto dto) {
+    public void updateReview(String id, ReviewDto dto) {
         ReviewDto existing = reviewMapper.findById(dto.getId());
         if (existing == null) {
             throw new IllegalStateException("기존 리뷰가 존재하지 않습니다.");

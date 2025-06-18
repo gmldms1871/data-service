@@ -12,4 +12,6 @@ public interface ReviewMapper {
     void updateReview(ReviewDto dto);  // 리뷰 수정
     int deleteReview(String id);  // 리뷰 삭제
     ReviewDto findById(String id);
+    int existsByTransactionId(String transactionId);
+
 }

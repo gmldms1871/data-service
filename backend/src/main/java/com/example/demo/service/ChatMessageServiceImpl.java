@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class ChatMessageServiceImpl implements ChatMessageService {
 
     private final ChatMessageMapper mapper;
+    private final ChatMessageMapper chatMessageMapper;
 
     @Override
     public ChatMessageDto sendMessage(ChatMessageDto dto, String senderCompanyId) {
@@ -46,8 +48,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     // 3. 메시지 읽음 처리
     @Override
-    public void markMessagesAsRead(String roomId, String readerId) {
-        mapper.updateReadMessages(roomId, readerId);
+    public void markMessagesAsRead(String roomId, String companyId) {
+        chatMessageMapper.markMessagesAsRead(Map.of(
+                "roomId", roomId,
+                "companyId", companyId
+        ));
     }
 
     // 4. 메시지 조회

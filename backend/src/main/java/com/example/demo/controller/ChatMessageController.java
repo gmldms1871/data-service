@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ChatMessageDto;
+import com.example.demo.exception.chat.InvalidChatRoomAccessException;
+import com.example.demo.exception.chat.MessageSendFailedException;
+import com.example.demo.exception.chat.NotLoggedInException;
 import com.example.demo.service.ChatMessageService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -23,35 +26,45 @@ public class ChatMessageController {
     public ResponseEntity<?> sendMessage(@RequestBody ChatMessageDto dto, HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+            throw new NotLoggedInException();
         }
 
-        try {
-            log.info("📥 메시지 전송 요청: companyId={}, dto={}", companyId, dto);
-            ChatMessageDto result = chatMessageService.sendMessage(dto, companyId);
-            return ResponseEntity.ok(result);
-        } catch (IllegalArgumentException e) {
-            log.warn("❌ 메시지 처리 오류: {}", e.getMessage());
-            return ResponseEntity.status(400).body(Map.of("error", e.getMessage() != null ? e.getMessage() : "처리 중 오류 발생"));
+        if (dto.getRoomId() == null || dto.getRoomId().isBlank()) {
+            throw new IllegalArgumentException("roomId는 필수입니다.");
         }
+
+        log.info("메시지 전송 요청: companyId={}, dto={}", companyId, dto);
+
+        ChatMessageDto result = chatMessageService.sendMessage(dto, companyId);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "메시지 전송 성공",
+                "messageData", result
+        ));
     }
+
 
     @GetMapping("/readMany/{roomId}")
     public ResponseEntity<?> getMessages(@PathVariable String roomId, HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
         if (companyId == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "로그인이 필요합니다."));
+            throw new NotLoggedInException();
         }
 
-        // 채팅방 접근 권한 확인
+        if (roomId == null || roomId.trim().isEmpty()) {
+            throw new IllegalArgumentException("roomId는 필수입니다.");
+        }
+
         if (!chatMessageService.hasAccessToRoom(roomId, companyId)) {
-            return ResponseEntity.status(403).body(Map.of("error", "채팅방에 접근할 수 없습니다."));
+            throw new InvalidChatRoomAccessException();
         }
 
-        // 읽음 처리 + 메시지 조회
         chatMessageService.markMessagesAsRead(roomId, companyId);
         List<ChatMessageDto> messages = chatMessageService.getMessages(roomId, companyId);
 
-        return ResponseEntity.ok(Map.of("messages", messages));
+        return ResponseEntity.ok(Map.of(
+                "message", "채팅 메시지 조회 성공",
+                "messages", messages
+        ));
     }
 }
