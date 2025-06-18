@@ -173,4 +173,8 @@ public class CompanyService {
                 .map(CompanyDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    public boolean existsById(String id) {
+        return companyRepository.existsById(id);
+    }
 }

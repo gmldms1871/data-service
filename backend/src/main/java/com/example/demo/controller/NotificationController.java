@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notification")
@@ -21,56 +22,68 @@ public class NotificationController {
     }
 
     /** 알림 생성 - 세션에서 senderId 자동으로 가져오기 */
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<?> create(
             @Valid @RequestBody NotificationRequestDto req,
             HttpSession session) {
 
-        // 세션에서 로그인한 사용자 ID 가져오기
         String senderId = (String) session.getAttribute("loginCompanyId");
         if (senderId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(java.util.Map.of("error", "로그인이 필요합니다"));
+                    .body(Map.of("error", "로그인이 필요합니다"));
         }
 
-        NotificationDto created = notificationService.createNotification(
-                senderId,              // 세션에서 가져온 발신자 ID
-                req.getReceiverId(),   // 수신자 ID
-                req.getTitle(),        // 제목
-                req.getContent()       // 내용
-        );
-
-        return ResponseEntity.ok(created);
+        try {
+            NotificationDto created = notificationService.createNotification(
+                    senderId,
+                    req.getReceiverId(),
+                    req.getTitle(),
+                    req.getContent()
+            );
+            return ResponseEntity.ok(created);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     /** 내가 받은 알림 조회 */
-    @GetMapping("/received")
+    @GetMapping("/received/readMany")
     public ResponseEntity<?> listReceived(HttpSession session) {
         String receiverId = (String) session.getAttribute("loginCompanyId");
         if (receiverId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(java.util.Map.of("error", "로그인이 필요합니다"));
+                    .body(Map.of("error", "로그인이 필요합니다"));
         }
 
-        List<NotificationDto> notifications = notificationService.getNotifications(receiverId);
-        return ResponseEntity.ok(notifications);
+        try {
+            List<NotificationDto> notifications = notificationService.getNotifications(receiverId);
+            return ResponseEntity.ok(notifications);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "알림 조회 실패", "details", e.getMessage()));
+        }
     }
 
     /** 내가 보낸 알림 조회 */
-    @GetMapping("/sent")
+    @GetMapping("/sent/readMany")
     public ResponseEntity<?> listSent(HttpSession session) {
         String senderId = (String) session.getAttribute("loginCompanyId");
         if (senderId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(java.util.Map.of("error", "로그인이 필요합니다"));
+                    .body(Map.of("error", "로그인이 필요합니다"));
         }
 
-        List<NotificationDto> notifications = notificationService.getSentNotifications(senderId);
-        return ResponseEntity.ok(notifications);
+        try {
+            List<NotificationDto> notifications = notificationService.getSentNotifications(senderId);
+            return ResponseEntity.ok(notifications);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "알림 조회 실패", "details", e.getMessage()));
+        }
     }
 
     /** 알림 읽음 처리 */
-    @PatchMapping("/{id}/read")
+    @PatchMapping("/{id}/updateRead")
     public ResponseEntity<?> markAsRead(
             @PathVariable("id") String id,
             HttpSession session) {
@@ -78,10 +91,14 @@ public class NotificationController {
         String userId = (String) session.getAttribute("loginCompanyId");
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(java.util.Map.of("error", "로그인이 필요합니다"));
+                    .body(Map.of("error", "로그인이 필요합니다"));
         }
 
-        NotificationDto updated = notificationService.markAsRead(id);
-        return ResponseEntity.ok(updated);
+        try {
+            NotificationDto updated = notificationService.markAsRead(id, userId);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }
