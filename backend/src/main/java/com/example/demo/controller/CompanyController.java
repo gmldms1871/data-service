@@ -7,7 +7,6 @@ import com.example.demo.service.CompanyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/company")
 public class CompanyController {
     private final CompanyService companyService;
 
@@ -25,15 +24,23 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
-    @PostMapping("/users")
+    @PostMapping("/register")
     public ResponseEntity<?> signup(@Valid @RequestBody CompanyRegistrationDto registrationDto) {
-        CompanyDto created = companyService.register(registrationDto);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Map.of(
-                        "message", "회원가입 성공",
-                        "company", created
-                ));
+        if (companyService.existsByBusinessNumber(registrationDto.getBusinessNumber())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "이미 등록된 사업자번호입니다."));
+        }
+
+        try {
+            CompanyDto created = companyService.register(registrationDto);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(Map.of(
+                            "message", "회원가입 성공",
+                            "company", created
+                    ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
@@ -41,6 +48,10 @@ public class CompanyController {
             @Valid @RequestBody LoginRequestDto loginRequest,
             HttpSession session
     ) {
+        if (loginRequest.getPassword().startsWith("$2a$") || loginRequest.getPassword().length() > 100) {
+            return ResponseEntity.badRequest().body(Map.of("error", "비정상적인 비밀번호 입력입니다."));
+        }
+
         return companyService.login(
                 loginRequest.getEmail(),
                 loginRequest.getPassword()
@@ -70,7 +81,7 @@ public class CompanyController {
         return ResponseEntity.ok(Map.of("message", "로그아웃 완료"));
     }
 
-    @GetMapping("/me")
+    @GetMapping("/readOne")
     public ResponseEntity<?> getMyInfo(HttpSession session) {
         String id = (String) session.getAttribute("loginCompanyId");
         if (id == null) {
@@ -78,14 +89,18 @@ public class CompanyController {
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "로그인 필요"));
         }
-        CompanyDto company = companyService.findById(id);
-        return ResponseEntity.ok(Map.of(
-                "message", "내 정보 조회 성공",
-                "company", company
-        ));
+        try {
+            CompanyDto company = companyService.findActiveById(id);
+            return ResponseEntity.ok(Map.of(
+                    "message", "내 정보 조회 성공",
+                    "company", company
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
     }
 
-    @PatchMapping("/users/me")
+    @PatchMapping("/update")
     public ResponseEntity<?> updateMyInfo(
             HttpSession session,
             @RequestBody Map<String, String> updates
@@ -96,14 +111,18 @@ public class CompanyController {
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "로그인 필요"));
         }
-        CompanyDto updated = companyService.update(id, updates);
-        return ResponseEntity.ok(Map.of(
-                "message", "정보 수정 성공",
-                "company", updated
-        ));
+        try {
+            CompanyDto updated = companyService.update(id, updates);
+            return ResponseEntity.ok(Map.of(
+                    "message", "정보 수정 성공",
+                    "company", updated
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
-    @DeleteMapping("/users/me")
+    @DeleteMapping("/delete")
     public ResponseEntity<?> deleteMyAccount(HttpSession session) {
         String id = (String) session.getAttribute("loginCompanyId");
         if (id == null) {
@@ -111,17 +130,25 @@ public class CompanyController {
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "로그인 필요"));
         }
-        companyService.deleteById(id);
-        session.invalidate();
-        return ResponseEntity.ok(Map.of("message", "회원 탈퇴 완료"));
+        try {
+            companyService.softDelete(id);
+            session.invalidate();
+            return ResponseEntity.ok(Map.of("message", "회원 탈퇴 완료"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
-    @GetMapping("/users")
+    @GetMapping("/readMany")
     public ResponseEntity<?> getAllUsers() {
-        List<CompanyDto> companies = companyService.findAll();
-        return ResponseEntity.ok(Map.of(
-                "message", "전체 회원 조회 성공",
-                "companies", companies
-        ));
+        try {
+            List<CompanyDto> companies = companyService.findAllActive();
+            return ResponseEntity.ok(Map.of(
+                    "message", "전체 회원 조회 성공",
+                    "companies", companies
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "회원 목록 조회 실패", "details", e.getMessage()));
+        }
     }
 }

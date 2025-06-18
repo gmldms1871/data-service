@@ -7,6 +7,7 @@ import com.example.demo.repository.CompanyRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,12 +46,12 @@ public class CompanyService {
         if (companyOpt.isPresent()) {
             Company company = companyOpt.get();
 
-            // 1. 먼저 평문 비밀번호 비교 (기존 데이터 지원)
-            if (password.equals(company.getPassword())) {
-                return Optional.of(CompanyDto.fromEntity(company));
+            // ✅ 삭제된 사용자 차단
+            if (company.getDeletedAt() != null) {
+                return Optional.empty();
             }
 
-            // 2. 암호화된 비밀번호 비교 (새로운 데이터 지원)
+            // 암호화된 비밀번호 비교
             if (passwordEncoder.matches(password, company.getPassword())) {
                 return Optional.of(CompanyDto.fromEntity(company));
             }
@@ -58,6 +59,7 @@ public class CompanyService {
 
         return Optional.empty();
     }
+
 
     // 내 정보 조회
     public CompanyDto findById(String id) {
@@ -129,5 +131,46 @@ public class CompanyService {
         if (updates.containsKey("homepage")) company.setHomepage(updates.get("homepage"));
         if (updates.containsKey("categoryId")) company.setCategoryId(updates.get("categoryId"));
         // 비밀번호는 암호화가 필요하므로 이 메서드에서 처리하지 않음
+    }
+
+    public void softDelete(String id) {
+        Company company = getCompanyById(id);
+
+        // 개인정보 마스킹
+        company.setEmail("deleted_" + company.getId() + "@example.com");
+        company.setUserName("탈퇴한 사용자");
+        company.setUserPhone(null);
+        company.setNickname(null);
+        company.setCompanyName("삭제된 기업");
+        company.setBusinessNumber(null);
+        company.setHomepage(null);
+        company.setProfileAttachmentUrl(null);
+
+        // 삭제 시간 기록
+        company.setDeletedAt(LocalDateTime.now());
+
+        companyRepository.save(company);
+    }
+
+    public boolean existsByBusinessNumber(String businessNumber) {
+        return companyRepository.existsByBusinessNumber(businessNumber);
+    }
+
+    public CompanyDto findActiveById(String id) {
+        Company company = companyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+
+        if (company.getDeletedAt() != null) {
+            throw new RuntimeException("탈퇴된 회원입니다.");
+        }
+
+        return CompanyDto.fromEntity(company);
+    }
+
+    public List<CompanyDto> findAllActive() {
+        return companyRepository.findAll().stream()
+                .filter(c -> c.getDeletedAt() == null)
+                .map(CompanyDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }

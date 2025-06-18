@@ -24,18 +24,23 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
 	// MySQL 드라이버 수정 - 기존 버전이 호환성 문제가 있을 수 있음
 	implementation 'com.mysql:mysql-connector-j:8.3.0'
 	// 또는 runtimeOnly 'com.mysql:mysql-connector-j:8.3.0'
 
+	//박희은 - UploadData
 	// CSV 파싱
 	implementation 'com.opencsv:opencsv:5.7.1'
 	// 통계 계산
 	implementation 'org.apache.commons:commons-math3:3.6.1'
+
+	//박희은 - CompanySecurity
+	// 비밀번호 암호화
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	// API 유효성 검사
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	implementation 'commons-io:commons-io:2.19.0'
 
