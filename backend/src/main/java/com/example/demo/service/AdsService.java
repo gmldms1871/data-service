@@ -34,6 +34,11 @@ public class AdsService {
     }
     // 광고 등록: adsPeriod, createAt, deletedAt 계산 후 저장
     public Ads createAd(Ads ad) {
+        // 중복 제목 검사
+        if (adsRepository.existsByCompanyIdAndTitle(ad.getCompanyId(), ad.getTitle())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 동일한 제목의 광고가 존재합니다.");
+        }
+
         ad.setDeletedAt(LocalDateTime.now().plusDays(ad.getAdsPeriod()));
         return adsRepository.save(ad);
     }
@@ -56,5 +61,36 @@ public class AdsService {
         }
 
         adsRepository.delete(ad);
+    }
+
+    // 광고 수정
+    public Ads updateAd(String id, Ads updatedAd, String companyId) {
+        Ads existing = getAdById(id);
+
+        if (!existing.getCompanyId().equals(companyId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인의 광고만 수정할 수 있습니다.");
+        }
+
+        // 제목 변경 시, 중복 제목 검사
+        boolean isTitleChanged = !existing.getTitle().equals(updatedAd.getTitle());
+        if (isTitleChanged && adsRepository.existsByCompanyIdAndTitle(companyId, updatedAd.getTitle())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 동일한 제목의 광고가 존재합니다.");
+        }
+
+        if (updatedAd.getTitle() != null) {
+            existing.setTitle(updatedAd.getTitle());
+        }
+        if (updatedAd.getContent() != null) {
+            existing.setContent(updatedAd.getContent());
+        }
+        if (updatedAd.getImageUrl() != null) {
+            existing.setImageUrl(updatedAd.getImageUrl());
+        }
+        if (updatedAd.getAdsPeriod() != null) {
+            existing.setAdsPeriod(updatedAd.getAdsPeriod());
+            existing.setDeletedAt(LocalDateTime.now().plusDays(updatedAd.getAdsPeriod()));
+        }
+
+        return adsRepository.save(existing);
     }
 }

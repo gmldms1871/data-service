@@ -38,4 +38,16 @@ public class Ads {
     // 삭제 시각 (soft-delete 용)
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    //제목
+    @Column(name = "title", nullable = false, length = 200)
+    private String title;
+
+    //본문 내용
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
+
+    //이미지 URL
+    @Column(name = "image_url", length = 300)
+    private String imageUrl;
 }

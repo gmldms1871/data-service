@@ -52,7 +52,23 @@ public class AdsController {
         return ResponseEntity.ok(new ResponseDto<>(true, "광고 등록 성공", createdAd));
     }
 
-    // 4) 광고 삭제 (세션 기반)
+    // 4) 광고 수정
+    @PatchMapping("/update/{adsId}")
+    public ResponseEntity<?> updateAd(@PathVariable String adsId, @RequestBody Ads updatedAd, HttpSession session) {
+        String companyId = (String) session.getAttribute("loginCompanyId");
+        if (companyId == null) {
+            return ResponseEntity.status(401).body(new ResponseDto<>(false, "로그인이 필요합니다", null));
+        }
+
+        try {
+            Ads result = adsService.updateAd(adsId, updatedAd, companyId);
+            return ResponseEntity.ok(new ResponseDto<>(true, "광고 수정 성공", result));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(new ResponseDto<>(false, e.getMessage(), null));
+        }
+    }
+
+    // 5) 광고 삭제 (세션 기반)
     @DeleteMapping("/delete/{adsId}")
     public ResponseEntity<?> deleteAd(@PathVariable String adsId, HttpSession session) {
         String companyId = (String) session.getAttribute("loginCompanyId");
