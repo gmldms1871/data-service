@@ -26,22 +26,27 @@ public class AttachmentService {
     public Attachment saveFile(MultipartFile file) throws IOException {
         if (file.isEmpty()) return null;
 
-//        String originalFilename = file.getOriginalFilename();
-//        String uuid = UUID.randomUUID().toString();
-//        String storedFileName = uuid + "_" + originalFilename;
-//        String filePath = uploadDir + storedFileName;
         String originalFilename = file.getOriginalFilename();
         String storedFileName = originalFilename;
-        String filePath = uploadDir + storedFileName;
 
-        if (!new File(filePath).exists()) {
-            new File(filePath).mkdirs();
+        // 디렉토리 경로 정리
+        String uploadPath = uploadDir.endsWith(File.separator)
+                ? uploadDir
+                : uploadDir + File.separator;
+
+        // 전체 저장 경로 조합 (OS에 맞게 안전하게)
+        String filePath = uploadPath + storedFileName;
+
+        // 디렉토리 없으면 생성 (파일 경로 X)
+        File dir = new File(uploadPath);
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
 
-        // 저장
-
+        // 파일 저장
         file.transferTo(new File(filePath));
 
+        // DB 저장용 객체 생성
         Attachment attachment = Attachment.builder()
                 .fileName(originalFilename)
                 .fileType(file.getContentType())
@@ -51,6 +56,7 @@ public class AttachmentService {
 
         return attachmentRepository.save(attachment);
     }
+
 
     public Attachment findById(String id) {
         Optional<Attachment> attachment = attachmentRepository.findById(id);
