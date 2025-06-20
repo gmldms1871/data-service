@@ -9,7 +9,7 @@ function LoginForm() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:4601/api/company/login", {
+      const res = await fetch("http://115.68.194.155:4601/api/company/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // 세션 유지
